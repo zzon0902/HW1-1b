@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Homework Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .homework-container {
+            text-align: center;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .homework-container img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        .controls, .navigation {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.record {
+            background-color: #28a745;
+            color: white;
+        }
+        button.stop {
+            background-color: #dc3545;
+            color: white;
+        }
+        button.submit {
+            background-color: #007bff;
+            color: white;
+            margin-top: 20px;
+        }
+        button.prev {
+            background-color: #ffc107;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button.next {
+            background-color: #ffc107;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: #d3d3d3;
+            color: #8c8c8c;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="homework-container">
+        <h2>Homework Assignment</h2>
+        <img src="https://via.placeholder.com/300" alt="Homework Image" id="homework-image">
+        <div class="navigation">
+            <button class="prev" id="prev-btn" disabled>Previous</button>
+            <button class="next" id="next-btn">Next</button>
+        </div>
+        <p id="status">Status: Not recording</p>
+        <div class="controls">
+            <button class="record" id="record-btn">Start Recording</button>
+            <button class="stop" id="stop-btn" disabled>Stop Recording</button>
+        </div>
+        <audio id="audio-playback" controls style="display: none; margin-top: 15px;"></audio>
+        <button class="submit" id="submit-btn" disabled>Submit Homework</button>
+    </div>
+
+    <script>
+        const images = [
+            "https://img.freepik.com/free-photo/single-whole-red-apple-white_114579-10489.jpg?t=st=1736858757~exp=1736862357~hmac=31bc795a42887b4154fe6383dd793792af4dd3a2d5907610794c52ae298dd155&w=1380",
+            "https://img.freepik.com/free-photo/delicious-orange-white_144627-16387.jpg?t=st=1736858830~exp=1736862430~hmac=19dc51843bf3b69192c629da7d55b3849faf0ee3f802d30f0417ab625b3b1c26&w=740",
+            "https://via.placeholder.com/300/0000FF"
+        ];
+        let currentImageIndex = 0;
+
+        const imageElement = document.getElementById('homework-image');
+        const prevButton = document.getElementById('prev-btn');
+        const nextButton = document.getElementById('next-btn');
+
+        const updateImage = () => {
+            imageElement.src = images[currentImageIndex];
+            prevButton.disabled = currentImageIndex === 0;
+            nextButton.disabled = currentImageIndex === images.length - 1;
+        };
+
+        prevButton.addEventListener('click', () => {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                updateImage();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentImageIndex < images.length - 1) {
+                currentImageIndex++;
+                updateImage();
+            }
+        });
+
+        updateImage();
+
+        let mediaRecorder;
+        let audioChunks = [];
+        const recordButton = document.getElementById('record-btn');
+        const stopButton = document.getElementById('stop-btn');
+        const submitButton = document.getElementById('submit-btn');
+        const audioPlayback = document.getElementById('audio-playback');
+        const statusText = document.getElementById('status');
+
+        recordButton.addEventListener('click', async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Audio recording is not supported in this browser.');
+                return;
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = event => {
+                audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioPlayback.src = audioUrl;
+                audioPlayback.style.display = 'block';
+                submitButton.disabled = false;
+                statusText.textContent = 'Status: Recording completed. Ready to submit.';
+            };
+
+            audioChunks = [];
+            mediaRecorder.start();
+            statusText.textContent = 'Status: Recording...'; // Update status to recording
+            recordButton.disabled = true;
+            stopButton.disabled = false;
+        });
+
+        stopButton.addEventListener('click', () => {
+            mediaRecorder.stop();
+            statusText.textContent = 'Status: Recording stopped'; // Update status to stopped
+            recordButton.disabled = false;
+            stopButton.disabled = true;
+        });
+
+        submitButton.addEventListener('click', async () => {
+    if (audioChunks.length > 0) {
+        // Create a Blob from the recorded audio
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+
+        // Create FormData to send the file to the server
+        const formData = new FormData();
+        formData.append('audioFile', audioBlob, 'homework.wav'); // Attach the file with a name
+
+        try {
+            // Send the audio file to the server
+            const response = await fetch('http://localhost:3000/submit-homework', {
+                method: 'POST',
+                body: formData,
+            });
+
+            // Handle the server's response
+            if (response.ok) {
+                alert('Homework submitted successfully!');
+                statusText.textContent = 'Status: Homework submitted';
+                submitButton.disabled = true;
+                audioPlayback.style.display = 'none';
+            } else {
+                alert('Failed to submit homework. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting homework:', error);
+            alert('An error occurred while submitting homework.');
+        }
+    } else {
+        alert('No recording found. Please record before submitting.');
+    }
+});
+
+
+
+    </script>
+</body>
+</html>
