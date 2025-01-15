@@ -91,16 +91,13 @@
 <input type="text" id="student-name" placeholder="Enter your name" required style="display: block; margin: 10px auto; padding: 5px;">
 
 <button class="submit" id="submit-btn" disabled>Submit Homework</button>
-
-
     </div>
 
     <script>
         const images = [
             "https://img.freepik.com/free-photo/single-whole-red-apple-white_114579-10489.jpg?t=st=1736858757~exp=1736862357~hmac=31bc795a42887b4154fe6383dd793792af4dd3a2d5907610794c52ae298dd155&w=1380",
             "https://img.freepik.com/free-photo/delicious-orange-white_144627-16387.jpg?t=st=1736858830~exp=1736862430~hmac=19dc51843bf3b69192c629da7d55b3849faf0ee3f802d30f0417ab625b3b1c26&w=740",
-            "https://via.placeholder.com/300/0000FF"
-        ];
+                    ];
         let currentImageIndex = 0;
 
         const imageElement = document.getElementById('homework-image');
@@ -173,25 +170,29 @@
             stopButton.disabled = true;
         });
 
-        submitButton.addEventListener('click', async () => {
-    const studentName = document.getElementById('student-name').value.trim();
+      submitButton.addEventListener('click', async () => {
+    const studentName = document.getElementById('student-name').value.trim(); // Get the student's name
+    console.log('Student Name:', studentName); // Debug: Log the student's name
+
     if (!studentName) {
         alert('Please enter your name.');
         return;
     }
 
     if (audioChunks.length > 0) {
-        // Create a Blob from the recorded audio
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-
-        // Create FormData to send the file and name to the server
         const formData = new FormData();
         formData.append('audioFile', audioBlob, 'homework.wav'); // Audio file
         formData.append('studentName', studentName); // Student name
+        console.log('FormData:', formData.get('studentName')); // Debug: Log FormData content
+console.log('FormData contents:');
+for (const pair of formData.entries()) {
+    console.log(pair[0] + ': ' + pair[1]);
+}
+
 
         try {
-            // Send the data to the server
-            const response = await fetch('http://localhost:3000/submit-homework', {
+            const response = await fetch('http://localhost:5000/submit-homework', {
                 method: 'POST',
                 body: formData,
             });
@@ -212,6 +213,7 @@
         alert('No recording found. Please record before submitting.');
     }
 });
+
 
 
 
