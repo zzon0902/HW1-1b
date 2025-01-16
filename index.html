@@ -262,10 +262,11 @@ submitButton.addEventListener('click', async () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/submit-homework', {
-                method: 'POST',
-                body: formData,
-            });
+            const response = await fetch('http://192.168.45.40:5000/submit-homework', {
+    method: 'POST',
+    body: formData,
+});
+
 
             if (response.ok) {
                 alert('Homework submitted successfully! (숙제 제출 완료!)');
