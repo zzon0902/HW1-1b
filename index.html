@@ -6,7 +6,7 @@
     <title>Student Homework Platform</title>
     <style>
         body {
-            font-family: Gill Sans Ultra Bold, sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
@@ -84,19 +84,19 @@
         }
 
         button.record {
-            background-color: #42b697;
+            background-color: #28a745;
             color: white;
             margin-bottom: 15px;
         }
 
         button.stop {
-            background-color: #fa4c4c;
+            background-color: #dc3545;
             color: white;
             margin-bottom: 15px;
         }
 
         button.submit {
-            background-color: #3888ff;
+            background-color: #007bff;
             color: white;
             margin-top: 20px;
         }
@@ -122,11 +122,11 @@
 </head>
 <body>
     <div class="homework-container">
-        <h2>Homework</h2>
+        <h2>Homework Assignment</h2>
         <img src="https://via.placeholder.com/300" alt="Homework Image" id="homework-image">
         <div class="navigation">
-            <button class="prev" id="prev-btn" disabled>◀</button>
-            <button class="next" id="next-btn">▶</button>
+            <button class="prev" id="prev-btn" disabled>Previous</button>
+            <button class="next" id="next-btn">Next</button>
         </div>
         <p id="status">Status: Not recording</p>
         <div class="controls">
@@ -143,11 +143,7 @@
       const images = [
     "http://localhost:5000/images/set1/1.jpg",
     "http://localhost:5000/images/set1/2.jpg",
-    "http://localhost:5000/images/set1/3.jpg",
-    "http://localhost:5000/images/set1/4.jpg",
-    "http://localhost:5000/images/set1/5.jpg",
-    "http://localhost:5000/images/set1/6.jpg",
-    "http://localhost:5000/images/set1/7.jpg"
+    "http://localhost:5000/images/set1/3.jpg"
 ];
 
 const imageElement = document.getElementById('homework-image');
