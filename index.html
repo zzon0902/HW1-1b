@@ -144,7 +144,8 @@
     "https://c47d-39-113-5-175.ngrok-free.app/images/set1/1.jpg",
     "https://c47d-39-113-5-175.ngrok-free.app/images/set1/2.jpg",
     "https://c47d-39-113-5-175.ngrok-free.app/images/set1/3.jpg"
-];
+].map((url) => `${url}?nocache=${Date.now()}`);
+
 
 
 const imageElement = document.getElementById('homework-image');
